@@ -1,0 +1,7 @@
+#BNF+IAT 1.0;
+!grammar monitor;
+!slot <key>;
+
+!start <monitorstart>;
+<monitorstart>:<key>;
+<key>:一二三四五|驾驶证|人民币;
