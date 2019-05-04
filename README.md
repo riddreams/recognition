@@ -1,1 +1,2 @@
 # Audio Recongnition
+讯飞语音识别官网C语言demo移植到Python
