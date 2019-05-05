@@ -30,7 +30,7 @@ def build_grm_cb(ecode, info, udata):
 class BuildGrammar(object):
     def __init__(self):
         # 调用动态链接库
-        self.MSC_X64DLL = WinDLL(MSCDLL_PATH)
+        self.msc = WinDLL(MSCDLL_PATH)
         # 绑定回调函数
         self.GRMCBFUN = CFUNCTYPE(c_int, c_int, c_char_p, POINTER(UserData))
         self.build_grm_cb = self.GRMCBFUN(build_grm_cb)
@@ -45,15 +45,15 @@ class BuildGrammar(object):
             ASR_RES_PATH, SAMPLE_RATE_16K, GRM_BUILD_PATH)
         # print('grm_build_params:', grm_build_params)
 
-        build_ret = self.MSC_X64DLL.QISRBuildGrammar(b'bnf', grm_content, length, grm_build_params.encode(), self.build_grm_cb, udata)
+        build_ret = self.msc.QISRBuildGrammar(b'bnf', grm_content, length, grm_build_params.encode(), self.build_grm_cb, udata)
         return build_ret
 
     def build(self):
         # 登录
-        ret = self.MSC_X64DLL.MSPLogin(None, None, LOGIN_CONFIG)
+        ret = self.msc.MSPLogin(None, None, LOGIN_CONFIG)
         if MSP_SUCCESS != ret:
             print('登录失败：', ret)
-            self.MSC_X64DLL.MSPLogout()
+            self.msc.MSPLogout()
             sys.exit(0)
 
         asr_data = UserData()
@@ -63,7 +63,7 @@ class BuildGrammar(object):
         ret = self.build_grammar(cp)
         if MSP_SUCCESS != ret:
             print('构建离线识别语法网络失败:', ret)
-            self.MSC_X64DLL.MSPLogout()
+            self.msc.MSPLogout()
             sys.exit(0)
 
         while asr_data.build_fini != 1:
@@ -72,9 +72,9 @@ class BuildGrammar(object):
 
         # print('asr_data.grammar_id:', asr_data.grammar_id)
         if MSP_SUCCESS != asr_data.errcode:
-            self.MSC_X64DLL.MSPLogout()
+            self.msc.MSPLogout()
             sys.exit(0)
         print('离线识别语法网络构建完成')
 
-        self.MSC_X64DLL.MSPLogout()
+        self.msc.MSPLogout()
         return asr_data.grammar_id.decode()

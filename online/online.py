@@ -2,7 +2,7 @@ from ctypes import *
 import time
 
 # 调用动态链接库
-MSC_X64DLL = WinDLL('../bin/msc.dll')
+msc = WinDLL('../bin/msc.dll')
 LOGIN_CONFIG = b'appid = 5cc8309a'
 SAMPLE_RATE_16K = 16000
 MSP_SUCCESS = 0
@@ -19,7 +19,7 @@ class Msp:
 
     @staticmethod
     def login():
-        ret = MSC_X64DLL.MSPLogin(None, None, LOGIN_CONFIG)
+        ret = msc.MSPLogin(None, None, LOGIN_CONFIG)
         if ret == MSP_SUCCESS:
             print('登录讯飞成功')
         else:
@@ -27,7 +27,7 @@ class Msp:
 
     @staticmethod
     def logout():
-        ret = MSC_X64DLL.MSPLogout()
+        ret = msc.MSPLogout()
         if ret == MSP_SUCCESS:
             print('退出讯飞成功')
         else:
@@ -37,8 +37,8 @@ class Msp:
     def isr(audiofile, session_begin_params):
         ret = c_int()
         session_id = c_voidp()
-        MSC_X64DLL.QISRSessionBegin.restype = c_char_p
-        session_id = MSC_X64DLL.QISRSessionBegin(None, session_begin_params, byref(ret))
+        msc.QISRSessionBegin.restype = c_char_p
+        session_id = msc.QISRSessionBegin(None, session_begin_params, byref(ret))
 
         pice_lne = 1638 * 2
         ep_status = c_int(0)
@@ -47,27 +47,27 @@ class Msp:
         wav_file = open(audiofile, 'rb')
         wav_data = wav_file.read(pice_lne)
 
-        ret = MSC_X64DLL.QISRAudioWrite(session_id, wav_data, len(wav_data), MSP_AUDIO_SAMPLE_FIRST,
-                                        byref(ep_status), byref(recog_status))
+        ret = msc.QISRAudioWrite(session_id, wav_data, len(wav_data), MSP_AUDIO_SAMPLE_FIRST,
+                                 byref(ep_status), byref(recog_status))
 
         time.sleep(0.1)
         while wav_data:
             wav_data = wav_file.read(pice_lne)
             if len(wav_data) == 0:
                 break
-            ret = MSC_X64DLL.QISRAudioWrite(session_id, wav_data, len(wav_data), MSP_AUDIO_SAMPLE_CONTINUE,
-                                            byref(ep_status), byref(recog_status))
+            ret = msc.QISRAudioWrite(session_id, wav_data, len(wav_data), MSP_AUDIO_SAMPLE_CONTINUE,
+                                     byref(ep_status), byref(recog_status))
             time.sleep(0.1)
         wav_file.close()
-        ret = MSC_X64DLL.QISRAudioWrite(session_id, None, 0, MSP_AUDIO_SAMPLE_LAST,
-                                        byref(ep_status), byref(recog_status))
+        ret = msc.QISRAudioWrite(session_id, None, 0, MSP_AUDIO_SAMPLE_LAST,
+                                 byref(ep_status), byref(recog_status))
 
         result = '识别结果为:'
         counter = 0
         while recog_status.value != MSP_REC_STATUS_COMPLETE:
             ret = c_int()
-            MSC_X64DLL.QISRGetResult.restype = c_char_p
-            ret_str = MSC_X64DLL.QISRGetResult(session_id, byref(recog_status), 0, byref(ret))
+            msc.QISRGetResult.restype = c_char_p
+            ret_str = msc.QISRGetResult(session_id, byref(recog_status), 0, byref(ret))
             if ret_str is not None:
                 result += ret_str.decode()
             counter += 1

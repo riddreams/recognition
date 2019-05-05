@@ -5,9 +5,9 @@ from const import *
 
 
 class Recognize(object):
-    def __init__(self, grammar_id):
+    def __init__(self, grammar_id, msc):
         self.grammar_id = grammar_id
-        self.MSC_X64DLL = WinDLL(MSCDLL_PATH)
+        self.msc = msc
 
     def run_asr(self, path):
         aud_stat = c_int(2)
@@ -27,8 +27,8 @@ class Recognize(object):
         # print(asr_params)
 
         session_id = c_char_p
-        self.MSC_X64DLL.QISRSessionBegin.restype = c_char_p
-        session_id = self.MSC_X64DLL.QISRSessionBegin(None, asr_params, byref(errcode))
+        self.msc.QISRSessionBegin.restype = c_char_p
+        session_id = self.msc.QISRSessionBegin(None, asr_params, byref(errcode))
 
         print('开始识别', path)
         asr_audiof = open(path, 'rb')
@@ -47,8 +47,9 @@ class Recognize(object):
             if temp_len <= 0:
                 break
 
-            self.MSC_X64DLL.QISRAudioWrite.restype = c_int
-            errcode = self.MSC_X64DLL.QISRAudioWrite(session_id, tmp, len(tmp), aud_stat, byref(ep_status), byref(rec_status))
+            self.msc.QISRAudioWrite.restype = c_int
+            errcode = self.msc.QISRAudioWrite(session_id, tmp, len(tmp),
+                                              aud_stat, byref(ep_status), byref(rec_status))
 
             pcm_count += temp_len
             # print(ep_status, ',', MSP_EP_AFTER_SPEECH)
@@ -57,13 +58,14 @@ class Recognize(object):
 
         asr_audiof.close()
 
-        self.MSC_X64DLL.QISRAudioWrite(session_id, None, 0, MSP_AUDIO_SAMPLE_LAST, byref(ep_status), byref(rec_status))
+        self.msc.QISRAudioWrite(session_id, None, 0, MSP_AUDIO_SAMPLE_LAST,
+                                byref(ep_status), byref(rec_status))
 
         errcode = c_int(errcode)
         # print('errcode:', errcode)
-        self.MSC_X64DLL.QISRGetResult.restype = c_char_p
+        self.msc.QISRGetResult.restype = c_char_p
         while MSP_REC_STATUS_COMPLETE != rss_status.value and MSP_SUCCESS == errcode.value:
-            rec_rslt = self.MSC_X64DLL.QISRGetResult(session_id, byref(rss_status), 0, byref(errcode))
+            rec_rslt = self.msc.QISRGetResult(session_id, byref(rss_status), 0, byref(errcode))
             time.sleep(0.1)
 
         if rec_rslt is not None:
@@ -73,6 +75,6 @@ class Recognize(object):
         else:
             print('没有识别结果')
 
-        self.MSC_X64DLL.QISRSessionEnd(session_id, None)
+        self.msc.QISRSessionEnd(session_id, None)
         return errcode.value
 

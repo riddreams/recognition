@@ -8,18 +8,17 @@ if __name__ == '__main__':
     grammar_id = build_grammar.build()
 
     # 登录
-    MSC_X64DLL = WinDLL(MSCDLL_PATH)
-    ret = MSC_X64DLL.MSPLogin(None, None, LOGIN_CONFIG)
+    msc = WinDLL(MSCDLL_PATH)
+    ret = msc.MSPLogin(None, None, LOGIN_CONFIG)
     if MSP_SUCCESS != ret:
         print('登录失败：', ret)
-        MSC_X64DLL.MSPLogout()
+        msc.MSPLogout()
         sys.exit(0)
 
     # 识别
-    recognize = Recognize(grammar_id)
+    recognize = Recognize(grammar_id, msc)
+    recognize.run_asr('../wav/monitor1.wav')
     recognize.run_asr('../wav/monitor1.pcm')
-    recognize.run_asr('../wav/monitor2.pcm')
-    recognize.run_asr('../wav/5.pcm')
 
     # 退出
-    MSC_X64DLL.MSPLogout()
+    msc.MSPLogout()
