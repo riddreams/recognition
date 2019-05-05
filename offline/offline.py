@@ -19,6 +19,7 @@ if __name__ == '__main__':
     recognize = Recognize(grammar_id)
     recognize.run_asr('../wav/monitor1.pcm')
     recognize.run_asr('../wav/monitor2.pcm')
+    recognize.run_asr('../wav/5.pcm')
 
     # 退出
     MSC_X64DLL.MSPLogout()

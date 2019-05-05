@@ -3,6 +3,15 @@ import subprocess
 import os
 
 
+def video2wav(from_path, to_path):
+    from_path = os.path.abspath(from_path)
+    to_path = os.path.abspath(to_path)
+    # wav格式，采样率16kHz，单声道，路径中包含空格可用引号
+    str_cmd = 'ffmpeg -i \"' + from_path + '\" -ac 1 -ar 16000 \"' + to_path + '\"'
+    # print(str_cmd)
+    subprocess.call(str_cmd)
+
+
 def audio2pcm(from_path, to_path):
     from_path = os.path.abspath(from_path)
     to_path = os.path.abspath(to_path)
@@ -25,4 +34,5 @@ if __name__ == '__main__':
     time_len = monitor.duration_seconds
     print('monitor1时长:', time_len, 's')
     # playvideo('../wav/monitor1.pcm')
+    # video2wav('../wav/5.mp4', '../wav/5.wav')
 

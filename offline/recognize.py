@@ -68,6 +68,8 @@ class Recognize(object):
 
         if rec_rslt is not None:
             print('识别结果为:', rec_rslt.decode('utf8'))
+        elif errcode.value != 0:
+            print('识别出现错误:', errcode.value)
         else:
             print('没有识别结果')
 
