@@ -17,8 +17,17 @@ if __name__ == '__main__':
 
     # 识别
     recognize = Recognize(grammar_id, msc)
-    recognize.run_asr('../wav/monitor1.wav')
-    recognize.run_asr('../wav/monitor1.pcm')
+    # recognize.run_asr('../wav/12345.pcm')
+    # recognize.run_asr('../wav/wav_test.pcm')
+    # recognize.run_asr('../wav/monitor1.pcm')
+    # recognize.run_asr('../wav/monitor2.pcm')
+    # recognize.run_asr('../wav/monitor3.pcm')
+
+    recognize.run_asr('../wav/ouput5.pcm')
+    recognize.run_asr('../wav/ouput53.pcm')
+    recognize.run_asr('../wav/ouput56.pcm')
+    recognize.run_asr('../wav/ouput59.pcm')
+    recognize.run_asr('../wav/ouput62.pcm')
 
     # 退出
     msc.MSPLogout()

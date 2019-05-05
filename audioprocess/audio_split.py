@@ -1,4 +1,6 @@
 import wave
+import os
+import subprocess
 import numpy as np
 import pylab as pl
 from pydub import AudioSegment
@@ -55,12 +57,20 @@ def splitaudio(path):
         else:
             i += 1
 
-    # audio = AudioSegment.from_wav(path)
-    # for fr in frame:
-    #     start = 1000 * (fr[0]-2)
-    #     end = 1000 * (fr[1]+2)
-    #     sound = audio[start:end]
-    #     sound.export('ouput'+str(fr[0])+'.wav', format='wav')
+    audio = AudioSegment.from_wav(path)
+    for fr in frame:
+        start = 1000 * (fr[0]-2)
+        end = 1000 * (fr[1]+2)
+        sound = audio[start:end]
+        from_path = 'ouput'+str(fr[0])+'.wav'
+        to_path = '../wav/ouput'+str(fr[0])+'.pcm'
+        sound.export(from_path, format='wav')
+        from_path = os.path.abspath(from_path)
+        to_path = os.path.abspath(to_path)
+        # wav格式，采样率16kHz，单声道，路径中包含空格可用引号
+        str_cmd = 'ffmpeg -y -i \"' + from_path + '\" -acodec pcm_s16le -f s16le -ac 1 -ar 16000 \"' + to_path + '\"'
+        # print(str_cmd)
+        subprocess.call(str_cmd)
 
     print(frame)
     # t = np.arange(0, len(short_enery))

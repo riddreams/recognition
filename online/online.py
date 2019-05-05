@@ -100,15 +100,15 @@ if __name__ == '__main__':
             print('bye bye!')
             break
         elif file == '1':
-            file_path = '../wav/12345.wav'
+            file_path = '../wav/12345.pcm'
         elif file == '2':
             file_path = '../wav/wav_test.pcm'
         elif file == '3':
             file_path = '../wav/monitor1.pcm'
         elif file == '4':
-            file_path = '../wav/monitor2.wav'
+            file_path = '../wav/monitor2.pcm'
         elif file == '5':
-            file_path = '../wav/monitor3.wav'
+            file_path = '../wav/monitor3.pcm'
         else:
             continue
         xf_text(file_path, SAMPLE_RATE_16K)

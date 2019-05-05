@@ -1,7 +1,9 @@
 #BNF+IAT 1.0;
 !grammar monitor;
 !slot <key>;
+!slot <key1>;
 
 !start <monitorstart>;
-<monitorstart>:<key>;
-<key>:一二三四五|驾照行驶证出示一下|罚款是交到银行去的;
+<monitorstart>:[<key>]|[<key1>];
+<key>:一二三四五|驾照行驶证|罚款是交到银行去的|违法记分达到|谢谢配合|你又溜了;
+<key1>:先去车上休息走走|你呀|后天休息呀;
